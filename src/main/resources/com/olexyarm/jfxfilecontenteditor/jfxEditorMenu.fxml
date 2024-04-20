@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.input.KeyCodeCombination?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.CheckMenuItem?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.CustomMenuItem?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Label?>
+
+
+<HBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:id="hboxMenu"
+      fx:controller="com.olexyarm.jfxfilecontenteditor.JfxFileContentEditorMenuController">
+
+    <MenuBar fx:id="mbMenuBar" layoutY="1.0" prefHeight="15.0" prefWidth="${hboxMenu.parent.width}">
+        <Menu fx:id="menuFile" mnemonicParsing="true" text="_File">
+            <MenuItem fx:id="newFile" mnemonicParsing="true" onAction="#newFile" text="_New File">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" code="N" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                </accelerator>
+            </MenuItem>
+            <MenuItem fx:id="openFile" mnemonicParsing="true" onAction="#openFile" text="_Open File">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                </accelerator>
+            </MenuItem>
+            <MenuItem fx:id="miSaveFile" mnemonicParsing="true" onAction="#saveFile" text="_Save File" visible="false">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                </accelerator>
+            </MenuItem>
+            <MenuItem fx:id="miSaveFileAs" mnemonicParsing="true" onAction="#saveFileAs" text="Save File _As" visible="false">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" code="A" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                </accelerator>
+            </MenuItem>
+            <MenuItem fx:id="miSaveFilesAll" mnemonicParsing="true" onAction="#saveFilesAll" text="Save Files Al_l" visible="false">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" code="L" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                </accelerator>
+            </MenuItem>
+            <MenuItem fx:id="miPrint" mnemonicParsing="true" onAction="#printFile" text="_Print" visible="false">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" code="P" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                </accelerator>
+            </MenuItem>
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem id="exit" mnemonicParsing="true" onAction="#exit" text="E_xit" />
+        </Menu>
+        <Menu fx:id="menuEdit" mnemonicParsing="false" text="Edit" visible="false">
+            <MenuItem fx:id="find" mnemonicParsing="true" onAction="#find" text="_Find">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" code="F" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                </accelerator>
+            </MenuItem>
+            <MenuItem fx:id="replace" mnemonicParsing="true" onAction="#replace" text="_Replace">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" code="R" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                </accelerator>
+            </MenuItem>
+        </Menu>
+        
+        <Menu fx:id="menuFont" mnemonicParsing="false" text="Font" visible="false">
+            <items>
+                <MenuItem fx:id="default" mnemonicParsing="false" onAction="#fontSelect" text="Default" />
+                <MenuItem fx:id="osDefault" mnemonicParsing="false" onAction="#fontSelect" text="OS Default" />
+                <Menu mnemonicParsing="false" text="Size">
+                    <CustomMenuItem fx:id="menuFontSize" mnemonicParsing="false" text="Font Size">
+                        <content>
+                            <HBox>
+                                <TextField fx:id="menuTextFielsFontSize" onAction="#fontSizeSelect"/>
+                            </HBox>
+                        </content>
+                    </CustomMenuItem>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Family">
+                    <CustomMenuItem fx:id="menuFontFamily" mnemonicParsing="false" text="Font Family">
+                        <content>
+                            <ListView fx:id="menuListViewFontFamily" onMouseClicked="#fontFamilySelect"></ListView>
+                        </content>
+                    </CustomMenuItem>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Charset">
+                    <items>
+                        <CustomMenuItem fx:id="menuCharset" mnemonicParsing="false" text="Charset">
+                            <content>
+                                <ListView fx:id="menuListViewCharset" onMouseClicked="#charsetSelect"></ListView>
+                            </content>
+                        </CustomMenuItem>
+                    </items>
+                </Menu>
+            </items>
+        </Menu>
+        
+        <Menu fx:id="menuFavorites" mnemonicParsing="false" text="Favorites">
+            <MenuItem fx:id="favorotesEdit" onAction="#favoritesEdit" text="E_dit">
+            </MenuItem>
+            <MenuItem fx:id="favorotesAdd" onAction="#favoritesAdd" text="Add">
+            </MenuItem>
+            <SeparatorMenuItem mnemonicParsing="false" />
+        </Menu>
+
+        <Menu fx:id="menuHelp" mnemonicParsing="false" text="Help">
+            <MenuItem fx:id="settingsEdit" onAction="#settingsEdit" text="Settings">
+            </MenuItem>
+            <MenuItem fx:id="about" onAction="#about" text="A_bout">
+            </MenuItem>
+        </Menu>
+
+    </MenuBar>
+
+</HBox>
