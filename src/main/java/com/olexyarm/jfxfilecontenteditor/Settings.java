@@ -111,6 +111,7 @@ public class Settings {
                 } catch (Throwable t) {
                     LOGGER.error("Could not get Path for Version file."
                             + " VersionFilePath=\"" + STR_VERSION_FILENAME + "\""
+                            + " urlResourceVersionFile=\"" + urlResourceVersionFile + "\""
                             + " uriFileVersion=\"" + uriFileVersion + "\""
                             + " Throwable=\"" + t.toString() + "\"");
                 }
