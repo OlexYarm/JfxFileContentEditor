@@ -128,7 +128,7 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/dependencies</outputDirectory>
+                            <outputDirectory>${project.build.directory}/release</outputDirectory>
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
@@ -145,9 +145,13 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
+                            <classpathPrefix>release/</classpathPrefix>
                             <mainClass>com.olexyarm.jfxfilecontenteditor.App</mainClass>
                         </manifest>
                     </archive>
+                    <outputDirectory>
+                        ${project.build.directory}/release
+                    </outputDirectory>
                 </configuration>
             </plugin>
 

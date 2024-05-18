@@ -46,6 +46,23 @@ The editor will create directory "...\JfxEditor" in user's home directory with f
 The editor will create directory "...\jfxfilecontenteditor\bin\logs" with log files in it.
 Log files will be rolled out and Zip compressed daily. The Zip archive files will be deleted after 60 days.
 
+3.4) Build modular jar file from command-line using Maven
+Download project source code from GitHub, change directory to project root directory "...\JfxFileContentEditor".
+Run below command from command-line to create modular jar file:
+
+mvn clean package
+
+The directory "...\JfxFileContentEditor\target\release" will be created.
+It will contain editor modular jar file and all dependencies jar files (JavaFX and logback).
+
+3.5) Run modular jar file from command-line command
+Before running editor modular jar file and dependencies jar files should be created as explained above.
+Copy all files from directory "...\JfxFileContentEditor\target\release" to desired location.
+Change directory to that directory.
+Run below command from command-line to run editor:
+
+java --module-path "." --module com.olexyarm.jfxfilecontenteditor/com.olexyarm.jfxfilecontenteditor.App %*
+
 4) Known limitations
 - the TextArea control using to show and edit content of file is very slow for large content,
  so JfxEditor should be used to work with files small/average size;

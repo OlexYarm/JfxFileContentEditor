@@ -15,10 +15,13 @@
 package com.olexyarm.jfxfilecontenteditor;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
@@ -47,7 +50,6 @@ public class Settings {
     public static String STR_BUILD_OS;
 
     private static final String STR_VERSION_FILENAME = "version.txt";
-    private static final String STR_TAB_NAME_ABOUT = "about";
 
     private static final List<String> LST_FONT_FAMILIES = Font.getFamilies();
     private static final ObservableList<String> OBS_LST_VIEW_FONT_FAMILIES = FXCollections.observableArrayList(LST_FONT_FAMILIES);
@@ -62,71 +64,46 @@ public class Settings {
     public static final String STR_CHARSET_DEFAULT = "UTF-8";
 
     static {
-        STR_VERSION = "unknown";
-        STR_BUILD_TIME = "unknown";
-        URL urlResourceVersionFile = Settings.class.getResource(STR_VERSION_FILENAME);
-        if (urlResourceVersionFile == null) {
-            LOGGER.error("Could not find Version file URL."
-                    + " VersionFilePath=\"" + STR_VERSION_FILENAME + "\"");
-        } else {
-            URI uriFileVersion;
-            try {
-                uriFileVersion = urlResourceVersionFile.toURI();
-                try {
-                    Path pathFileVersion = Paths.get(uriFileVersion);
-                    if (!Utils.checkFileExist(STR_TAB_NAME_ABOUT, pathFileVersion)) {
-                        LOGGER.error("Version file does not exist."
-                                + " VersionFilePath=\"" + STR_VERSION_FILENAME + "\""
-                                + " uriFileVersion=\"" + uriFileVersion + "\"");
-                    } else {
-                        String strVersionFileContent = Utils.readTextFileToString(pathFileVersion);
-                        if (strVersionFileContent == null) {
-                            LOGGER.error("Version file is empty."
-                                    + " VersionFilePath=\"" + STR_VERSION_FILENAME + "\""
-                                    + " uriFileVersion=\"" + uriFileVersion + "\""
-                                    + " pathFileVersion=\"" + pathFileVersion + "\"");
-                        } else {
-                            int intPosVersion = strVersionFileContent.indexOf("Build.version");
-                            int intPosBuildDate = strVersionFileContent.indexOf("Build.date");
-                            int intPosJavaHome = strVersionFileContent.indexOf("Build.JavaHome");
-                            int intPosOs = strVersionFileContent.indexOf("Build.OS");
-
-                            if (intPosVersion >= 0 && intPosBuildDate >= 0 && intPosJavaHome > 0 && intPosOs > 0) {
-                                STR_VERSION = strVersionFileContent.substring(intPosVersion, intPosBuildDate - 1);
-                                STR_BUILD_TIME = strVersionFileContent.substring(intPosBuildDate, intPosJavaHome - 1);
-                                STR_BUILD_JAVA_HOME = strVersionFileContent.substring(intPosJavaHome, intPosOs - 1);
-                                STR_BUILD_OS = strVersionFileContent.substring(intPosOs);
-                                LOGGER.info("Parsed Version file."
-                                        + " VersionFilePath=\"" + STR_VERSION_FILENAME + "\""
-                                        + " uriFileVersion=\"" + uriFileVersion + "\""
-                                        + " pathFileVersion=\"" + pathFileVersion + "\""
-                                        + " strVersionFileContent=\"" + strVersionFileContent + "\""
-                                        + " STR_VERSION=\"" + STR_VERSION + "\""
-                                        + " STR_BUILD_TIME=\"" + STR_BUILD_TIME + "\""
-                                        + " STR_BUILD_JAVA_HOME=\"" + STR_BUILD_JAVA_HOME + "\""
-                                        + " STR_BUILD_OS=\"" + STR_BUILD_OS + "\"");
-                            }
-                        }
-                    }
-                } catch (Throwable t) {
-                    LOGGER.error("Could not get Path for Version file."
-                            + " VersionFilePath=\"" + STR_VERSION_FILENAME + "\""
-                            + " urlResourceVersionFile=\"" + urlResourceVersionFile + "\""
-                            + " uriFileVersion=\"" + uriFileVersion + "\""
-                            + " Throwable=\"" + t.toString() + "\"");
+        try (InputStream is = Settings.class.getResourceAsStream(STR_VERSION_FILENAME); BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+            String strLine;
+            int intLineCount = 0;
+            while ((strLine = br.readLine()) != null) {
+                intLineCount++;
+                if (strLine.startsWith("Build.version")) {
+                    STR_VERSION = strLine;
+                } else if (strLine.startsWith("Build.date")) {
+                    STR_BUILD_TIME = strLine;
+                } else if (strLine.startsWith("Build.JavaHome")) {
+                    STR_BUILD_JAVA_HOME = strLine;
+                } else if (strLine.startsWith("Build.OS")) {
+                    STR_BUILD_OS = strLine;
+                } else {
+                    LOGGER.info("Unknown line in Version file."
+                            + " VersionFileName=\"" + STR_VERSION_FILENAME + "\""
+                            + " LineNumber=" + intLineCount
+                            + " Line=\"" + strLine + "\""
+                    );
                 }
-            } catch (Throwable t) {
-                LOGGER.error("Could not get URI for Version file."
-                        + " VersionFilePath=\"" + STR_VERSION_FILENAME + "\""
-                        + " urlResourceVersionFile=\"" + urlResourceVersionFile + "\""
-                        + " Throwable=\"" + t.toString() + "\"");
             }
+            LOGGER.info("Parsed Version file."
+                    + " VersionFileName=\"" + STR_VERSION_FILENAME + "\""
+                    + " STR_VERSION=\"" + STR_VERSION + "\""
+                    + " STR_BUILD_TIME=\"" + STR_BUILD_TIME + "\""
+                    + " STR_BUILD_JAVA_HOME=\"" + STR_BUILD_JAVA_HOME + "\""
+                    + " STR_BUILD_OS=\"" + STR_BUILD_OS + "\"");
+        } catch (IOException ex) {
+            LOGGER.error("Could not read Version file."
+                    + " VersionFilePath=\"" + STR_VERSION_FILENAME + "\""
+                    + " IOException=\"" + ex.toString() + "\"");
+        } catch (Throwable t) {
+            LOGGER.error("Could not read Version file."
+                    + " VersionFilePath=\"" + STR_VERSION_FILENAME + "\""
+                    + " Throwable=\"" + t.toString() + "\"");
         }
     }
-
-// -------------------------------------------------------------------------------------
-// Unmodifiable settings
-// -------------------------------------------------------------------------------------
+    // -------------------------------------------------------------------------------------
+    // Unmodifiable settings
+    // -------------------------------------------------------------------------------------
     public static final String STR_DIRECTORY_USER_HOME = "user.home";
     public static String STR_DIRECTORY_USER_HOME_PATH = System.getProperty(STR_DIRECTORY_USER_HOME);
 
