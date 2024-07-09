@@ -23,12 +23,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.URI;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -44,10 +41,11 @@ public class Settings {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Settings.class);
 
-    public static String STR_VERSION;
-    public static String STR_BUILD_TIME;
-    public static String STR_BUILD_JAVA_HOME;
-    public static String STR_BUILD_OS;
+    private static final String STR_UNKNOWN = "UNKNOWN";
+    public static String STR_VERSION = STR_UNKNOWN;
+    public static String STR_BUILD_TIME = STR_UNKNOWN;
+    public static String STR_BUILD_JAVA_HOME = STR_UNKNOWN;
+    public static String STR_BUILD_OS = STR_UNKNOWN;
 
     private static final String STR_VERSION_FILENAME = "version.txt";
 
@@ -145,12 +143,12 @@ public class Settings {
     public static String STR_BACKUP_FILES_EXT = "bak";
 
     // -------------------------------------------------------------------------------------
-    private static final String STR_PROP_NAME_FILE_FAVORITES_NAME = "Favorites";
+    private static final String STR_PROP_NAME_FILE_FAVORITES_NAME = "Favorites"; // for future use
     public static final String STR_FILE_FAVORITES_NAME = "Favorites";
     public static final String STR_FILE_FAVORITES_EXT = "txt";
 
     // -------------------------------------------------------------------------------------
-    private static final String STR_PROP_NAME_FILE_FAVORITES_DIR = "Favorites_path";
+    private static final String STR_PROP_NAME_FILE_FAVORITES_DIR = "Favorites_path"; // for future use
     public static final String STR_FILE_FAVORITES_DIR = "";
 
     // -------------------------------------------------------------------------------------
@@ -169,9 +167,13 @@ public class Settings {
     // Modifiable settings
     // -------------------------------------------------------------------------------------
     private static final String STR_PROP_NAME_BACKUP_FILES_ENABLED = "BakupFiles_enabled";
+    private static final boolean BOO_BACKUP_FILES_EABLED_DEFAULT = true;
     public static boolean BOO_BACKUP_FILES_EABLED = true;
 
-    // -------------------------------------------------------------------------------------
+    private static final String STR_PROP_NAME_BACKUP_FILES_DAILY_ONLY = "BackupFiles_DailyOnly";
+    private static final boolean BOO_BACKUP_FILES_DAILY_ONLY_DEFAULT = true;
+    public static boolean BOO_BACKUP_FILES_DAILY_ONLY;
+
     private static final String STR_PROP_NAME_FILEBACKUP_MAX = "BackupFiles_max";
     private static final int INT_BACKUP_FILES_MAX_MAX = 500;
     public static int INT_BACKUP_FILES_MAX = 3;
@@ -179,7 +181,8 @@ public class Settings {
     // -------------------------------------------------------------------------------------
     private static final String STR_PROP_NAME_TABS_MAX = "Tabs_max";
     private static final int INT_TABS_COUNT_MAX_MAX = 50;
-    public static int INT_TABS_COUNT_MAX = 3;
+    private static final int INT_TABS_COUNT_MAX_DEFAULT = 3;
+    public static int INT_TABS_COUNT_MAX;
 
     // -------------------------------------------------------------------------------------
     private static final String STR_PROP_NAME_LOG_LEVEL = "Log_level";
@@ -191,7 +194,6 @@ public class Settings {
     // -------------------------------------------------------------------------------------
     public static final double DOUBLE_FONT_SIZE_MAX = 36;
     public static final double DOUBLE_FONT_SIZE_MIN = 8;
-    public static final double DOUBLE_FONT_SIZE_DEFAULT = 22;
     private static final String STR_PROP_NAME_FONT_SIZE_CURRENT = "Font_size_current";
     public static double DOUBLE_FONT_SIZE_CURRENT;
 
@@ -233,7 +235,7 @@ public class Settings {
             INT_WINDOW_WIDTH = getPropValueInt(STR_PROP_NAME_WINDOW_WIDTH, "" + INT_WINDOW_WIDTH_DEFAULT, INT_WINDOW_WIDTH_MAX);
             INT_WINDOW_HIGH = getPropValueInt(STR_PROP_NAME_WINDOW_HIGH, "" + INT_WINDOW_HIGH_DEFAULT, INT_WINDOW_HIGH_MAX);
 
-            INT_TABS_COUNT_MAX = getPropValueInt(STR_PROP_NAME_TABS_MAX, "" + INT_TABS_COUNT_MAX, INT_TABS_COUNT_MAX_MAX);
+            INT_TABS_COUNT_MAX = getPropValueInt(STR_PROP_NAME_TABS_MAX, "" + INT_TABS_COUNT_MAX_DEFAULT, INT_TABS_COUNT_MAX_MAX);
 
             strPropValue = prop.getProperty(STR_PROP_NAME_BACKUP_FILES_EXT);
             if (strPropValue == null) {
@@ -242,13 +244,8 @@ public class Settings {
                 STR_BACKUP_FILES_EXT = strPropValue;
             }
 
-            BOO_BACKUP_FILES_EABLED = getPropValueBoolean(STR_PROP_NAME_BACKUP_FILES_ENABLED, BOO_BACKUP_FILES_EABLED ? "Y" : "N");
-            if (strPropValue == null) {
-                LOGGER.debug("Could not find property \"" + STR_PROP_NAME_BACKUP_FILES_ENABLED + "\"");
-            } else {
-                STR_BACKUP_FILES_EXT = strPropValue;
-            }
-
+            BOO_BACKUP_FILES_EABLED = getPropValueBoolean(STR_PROP_NAME_BACKUP_FILES_ENABLED, BOO_BACKUP_FILES_EABLED_DEFAULT ? "Y" : "N");
+            BOO_BACKUP_FILES_DAILY_ONLY = getPropValueBoolean(STR_PROP_NAME_BACKUP_FILES_DAILY_ONLY, BOO_BACKUP_FILES_DAILY_ONLY_DEFAULT ? "Y" : "N");
             INT_BACKUP_FILES_MAX = getPropValueInt(STR_PROP_NAME_FILEBACKUP_MAX, "" + INT_BACKUP_FILES_MAX, INT_BACKUP_FILES_MAX_MAX);
 
             DOUBLE_FONT_SIZE_CURRENT = getPropValueDouble(STR_PROP_NAME_FONT_SIZE_CURRENT, "" + DOUBLE_FONT_SIZE_OS_DEFAULT, DOUBLE_FONT_SIZE_MAX);
@@ -287,6 +284,7 @@ public class Settings {
         prop.setProperty(STR_PROP_NAME_BACKUP_FILES_EXT, STR_BACKUP_FILES_EXT);
 
         prop.setProperty(STR_PROP_NAME_BACKUP_FILES_ENABLED, BOO_BACKUP_FILES_EABLED ? "Y" : "N");
+        prop.setProperty(STR_PROP_NAME_BACKUP_FILES_DAILY_ONLY, BOO_BACKUP_FILES_DAILY_ONLY ? "Y" : "N");
         if (INT_BACKUP_FILES_MAX <= 0) {
             INT_BACKUP_FILES_MAX = 1;
         }
@@ -358,18 +356,14 @@ public class Settings {
         if (strPropValue == null) {
             strPropValue = strPropValueDefault;
         }
-        switch (strPropValue) {
-            case "Y":
-            case "YES":
-                booValue = true;
-                break;
-            case "N":
-            case "NO":
-                booValue = false;
-                break;
-            default:
-                booValue = true;
-        }
+        booValue = switch (strPropValue) {
+            case "Y", "YES" ->
+                true;
+            case "N", "NO" ->
+                false;
+            default ->
+                true;
+        };
         return booValue;
     }
 

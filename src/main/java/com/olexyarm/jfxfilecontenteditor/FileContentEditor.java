@@ -24,6 +24,9 @@ import java.nio.charset.CodingErrorAction;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
+import java.time.LocalDate;
+import java.util.concurrent.TimeUnit;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
@@ -691,6 +694,38 @@ public class FileContentEditor extends Control {
                     + " TabId=\"" + strTabId + "\""
                     + " pathFile=\"" + pathFile + "\"");
             return;
+        }
+        if (Settings.BOO_BACKUP_FILES_DAILY_ONLY) {
+            FileTime ft;
+            try {
+                ft = Files.getLastModifiedTime(pathFile);
+            } catch (IOException ex) {
+                LOGGER.error("Could not get getLastModifiedTime."
+                        + " TabId=\"" + strTabId + "\""
+                        + " pathFile=\"" + pathFile + "\""
+                        + " IOException=\"" + ex.toString() + "\"");
+                return;
+            }
+            long lngFileModifiedDays = ft.to(TimeUnit.DAYS);
+
+            LocalDate localDate = LocalDate.now();
+            long lngLocalDateEpochDay = localDate.toEpochDay();
+
+            LOGGER.debug("Compare File Modified Days and Current Day."
+                    + " TabId=\"" + strTabId + "\""
+                    + " pathFile=\"" + pathFile + "\""
+                    + " FileTime=\"" + ft + "\""
+                    + " lngFileModifiedDays=\"" + lngFileModifiedDays + "\""
+                    + " localDate=\"" + localDate + "\""
+                    + " lngLocalDateEpochDay=\"" + lngLocalDateEpochDay + "\"");
+            if (lngFileModifiedDays - lngLocalDateEpochDay >= 0) {
+                LOGGER.debug("Skip updating backup files."
+                        + " TabId=\"" + strTabId + "\""
+                        + " pathFile=\"" + pathFile + "\""
+                        + " lngFileModifiedDays=\"" + lngFileModifiedDays + "\""
+                        + " lngLocalDateEpochDay=\"" + lngLocalDateEpochDay + "\"");
+                return;
+            }
         }
 
         // Compute FilePath string without file extension.
